@@ -12,6 +12,7 @@
 int main(int argc, char **argv) {
     uid_t uid = geteuid(); // Get the effective user ID
     struct passwd *pw = getpwuid(uid);
+    const char *username = pw ? pw->pw_name : "unknown";
     tb_init();
     tb_set_output_mode(TB_OUTPUT_256);
     tb_set_clear_attrs(TB_DEFAULT,  236);
@@ -67,8 +68,8 @@ int main(int argc, char **argv) {
             if (historyBuf[i * TEXT_BUFSIZ] != 0) {
                 int j = 0, xOffset = 0;
                 do {
-                    tb_set_cell(xOffset++ + 1, h - 3 - yOffset, pw->pw_name[j], INPUT_FG - 32, TB_HI_BLACK);
-                } while (pw->pw_name[j++] != 0 && xOffset < w - 4);
+                    tb_set_cell(xOffset++ + 1, h - 3 - yOffset, username[j], INPUT_FG - 32, TB_HI_BLACK);
+                } while (username[j++] != 0 && xOffset < w - 4);
                 tb_set_cell(xOffset++, h - 3 - yOffset, ':', INPUT_FG - 32, TB_HI_BLACK);
                 j = 0;
                 do {
