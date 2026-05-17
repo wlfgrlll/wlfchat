@@ -30,7 +30,9 @@ int main(int argc, char **argv) {
         if (ev.type == TB_EVENT_RESIZE) {
             w = tb_width();
             h = tb_height();
-            buf[w - 2] = 0;
+            if (w >= 2 && w - 2 < TEXT_BUFSIZ) {
+                buf[w - 2] = 0;
+            }
         }
         if (ev.type == TB_EVENT_KEY && ev.key == 0 && c < TEXT_BUFSIZ - 1 && c < w - 2) {
             buf[c++] = ev.ch;
