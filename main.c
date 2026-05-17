@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
     tb_set_clear_attrs(TB_DEFAULT,  236);
     int w = tb_width();
     int h = tb_height();
-    char buf[TEXT_BUFSIZ];
+    uint32_t buf[TEXT_BUFSIZ];
     buf[0] = 0;
     int c = 0;
     struct tb_event ev;
