@@ -2,6 +2,7 @@
 #include "wlfchatutils.h"
 #include <stdlib.h>
 #include <pwd.h>
+#include <string.h>
 
 #define TEXT_BUFSIZ 64
 #define HISTORY_BUFSIZ 256
@@ -39,7 +40,7 @@ int main(int argc, char **argv) {
             buf[--c] = 0;
         }
         if (ev.type == TB_EVENT_KEY && ev.key == TB_KEY_ENTER && c > 0) {
-            for (int i = 0; i < TEXT_BUFSIZ; i++) historyBuf[historyBufCount * TEXT_BUFSIZ + i] = buf[i];
+            memcpy(&historyBuf[historyBufCount * TEXT_BUFSIZ], buf, sizeof(*historyBuf) * TEXT_BUFSIZ);
             historyBufCount++;
             c = 0;
             buf[0] = 0;
