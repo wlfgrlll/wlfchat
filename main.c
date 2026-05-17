@@ -8,6 +8,16 @@
 #define INPUT_BG 0xf1
 #define INPUT_FG 226
 
+int render_string(int x, int y, int max_w, uint32_t fg, uint32_t bg, const void *str, int is_wide) {
+    int xOffset = 0;
+    for (int j = 0; x + xOffset < max_w; j++) {
+        uint32_t ch = is_wide ? ((const uint32_t*)str)[j] : (uint32_t)((const char*)str)[j];
+        if (ch == 0) break;
+        tb_set_cell(x + xOffset++, y, ch, fg, bg);
+    }
+    return xOffset;
+}
+
 int main(int argc, char **argv) {
     uid_t uid = geteuid(); // Get the effective user ID
     struct passwd *pw = getpwuid(uid);
@@ -56,15 +66,13 @@ int main(int argc, char **argv) {
         //Print history buffer
         for (int i = historyBufCount - 1, yOffset = 0; i >= 0; i--) {
             if (historyBuf[i * TEXT_BUFSIZ] != 0) {
-                int j = 0, xOffset = 0;
-                do {
-                    tb_set_cell(xOffset++ + 1, h - 3 - yOffset, pw->pw_name[j], INPUT_FG - 32, TB_HI_BLACK);
-                } while (pw->pw_name[j++] != 0 && xOffset < w - 4);
-                tb_set_cell(xOffset++, h - 3 - yOffset, ':', INPUT_FG - 32, TB_HI_BLACK);
-                j = 0;
-                do {
-                    tb_set_cell(xOffset++ + 1, h - 3 - yOffset, historyBuf[i * TEXT_BUFSIZ + j], INPUT_FG, TB_HI_BLACK);
-                } while (historyBuf[i * TEXT_BUFSIZ + ++j] != 0 && xOffset < w - 4);
+                int xOffset = 1;
+                xOffset += render_string(xOffset, h - 3 - yOffset, w - 3, INPUT_FG - 32, TB_HI_BLACK, pw->pw_name, 0);
+                if (xOffset < w - 3) {
+                    tb_set_cell(xOffset++, h - 3 - yOffset, ':', INPUT_FG - 32, TB_HI_BLACK);
+                    xOffset++;
+                    render_string(xOffset, h - 3 - yOffset, w - 3, INPUT_FG, TB_HI_BLACK, &historyBuf[i * TEXT_BUFSIZ], 1);
+                }
                 yOffset++;
             }
         }
