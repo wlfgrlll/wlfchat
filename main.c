@@ -20,6 +20,10 @@ int main(int argc, char **argv) {
     uint16_t historyBufCount = 0;
     buf[0] = 0;
     uint32_t* historyBuf = malloc(sizeof(wchar_t) * TEXT_BUFSIZ * HISTORY_BUFSIZ);
+    if (historyBuf == NULL) {
+        tb_shutdown();
+        return 1;
+    }
     for (int i = 0; i < HISTORY_BUFSIZ; i++) historyBuf[0] = 0;
     int c = 0;
     struct tb_event ev;
