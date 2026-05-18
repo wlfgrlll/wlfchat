@@ -13,3 +13,13 @@ int printBox(const int x1, const int y1, const int x2, const int y2, const uint3
   }
   return 0;
 }
+
+int render_string(const int x, const int y, const int max_w, const uint32_t fg, const uint32_t bg, const void *str, const bool is_wide) {
+  int xOffset = 0;
+  for (int j = 0; x + xOffset < max_w; j++) {
+    const uint32_t ch = is_wide ? ((const uint32_t*)str)[j] : (uint32_t)((const char*)str)[j];
+    if (ch == 0) break;
+    tb_set_cell(x + xOffset++, y, ch, fg, bg);
+  }
+  return xOffset;
+}
