@@ -10,22 +10,31 @@
 #define INPUT_FG 226
 
 int main(int argc, char **argv) {
-    uid_t uid = geteuid(); // Get the effective user ID
+    //Get username
+    uid_t uid = geteuid();
     struct passwd *pw = getpwuid(uid);
     const char *username = pw ? pw->pw_name : "???";
+
+    //Initialize termbox2
     tb_init();
     tb_set_output_mode(TB_OUTPUT_256);
     tb_set_clear_attrs(TB_DEFAULT,  236);
     int w = tb_width();
     int h = tb_height();
-    uint32_t buf[TEXT_BUFSIZ];
-    uint16_t historyBufCount = 0;
-    buf[0] = 0;
-    uint32_t* historyBuf = malloc(sizeof(wchar_t) * TEXT_BUFSIZ * HISTORY_BUFSIZ);
-    for (int i = 0; i < HISTORY_BUFSIZ; i++) historyBuf[0] = 0;
-    int c = 0;
     struct tb_event ev;
 
+    //Declare buffers
+    uint32_t buf[TEXT_BUFSIZ]; //Input text buffer
+    int c = 0; //Current cursor position
+    uint32_t* historyBuf; //Chat history buffer
+    uint16_t historyBufCount = 0; //Chat history buffer message count
+
+    //Initialize buffers
+    historyBuf = malloc(sizeof(wchar_t) * TEXT_BUFSIZ * HISTORY_BUFSIZ);
+    buf[0] = 0;
+    for (int i = 0; i < HISTORY_BUFSIZ; i++) historyBuf[0] = 0;
+
+    //Main event loop
     do {
         //Handle events
         if (ev.type == TB_EVENT_RESIZE) {
