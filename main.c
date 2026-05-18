@@ -1,3 +1,4 @@
+#define TB_IMPL
 #include "termbox2.h"
 #include "wlfchatutils.h"
 #include <stdlib.h>
@@ -9,26 +10,38 @@
 #define INPUT_FG 226
 
 int main(int argc, char **argv) {
-    uid_t uid = geteuid(); // Get the effective user ID
+    //Get username
+    uid_t uid = geteuid();
     struct passwd *pw = getpwuid(uid);
+    const char *username = pw ? pw->pw_name : "???";
+
+    //Initialize termbox2
     tb_init();
     tb_set_output_mode(TB_OUTPUT_256);
     tb_set_clear_attrs(TB_DEFAULT,  236);
     int w = tb_width();
     int h = tb_height();
-    uint32_t buf[TEXT_BUFSIZ];
-    uint16_t historyBufCount = 0;
-    buf[0] = 0;
-    uint32_t* historyBuf = calloc(TEXT_BUFSIZ * HISTORY_BUFSIZ, sizeof(wchar_t));
-    int c = 0;
     struct tb_event ev;
 
+    //Declare buffers
+    uint32_t buf[TEXT_BUFSIZ]; //Input text buffer
+    int c = 0; //Current cursor position
+    uint32_t* historyBuf; //Chat history buffer
+    uint16_t historyBufCount = 0; //Chat history buffer message count
+
+    //Initialize buffers
+    historyBuf = calloc(TEXT_BUFSIZ * HISTORY_BUFSIZ, sizeof(wchar_t));
+    buf[0] = 0;
+
+    //Main event loop
     do {
         //Handle events
         if (ev.type == TB_EVENT_RESIZE) {
             w = tb_width();
             h = tb_height();
-            buf[w - 2] = 0;
+            if (w >= 2 && w - 2 < TEXT_BUFSIZ) {
+                buf[w - 2] = 0;
+            }
         }
         if (ev.type == TB_EVENT_KEY && ev.key == 0 && c < TEXT_BUFSIZ - 1 && c < w - 2) {
             buf[c++] = ev.ch;
@@ -38,6 +51,12 @@ int main(int argc, char **argv) {
             buf[--c] = 0;
         }
         if (ev.type == TB_EVENT_KEY && ev.key == TB_KEY_ENTER && c > 0) {
+            if (historyBufCount >= HISTORY_BUFSIZ || historyBufCount >= h - 3) {
+                for (int i = 0; i < (HISTORY_BUFSIZ - 1) * TEXT_BUFSIZ; i++) {
+                    historyBuf[i] = historyBuf[i + TEXT_BUFSIZ];
+                }
+                historyBufCount = HISTORY_BUFSIZ - 1;
+            }
             for (int i = 0; i < TEXT_BUFSIZ; i++) historyBuf[historyBufCount * TEXT_BUFSIZ + i] = buf[i];
             historyBufCount++;
             c = 0;
@@ -57,8 +76,8 @@ int main(int argc, char **argv) {
             if (historyBuf[i * TEXT_BUFSIZ] != 0) {
                 int j = 0, xOffset = 0;
                 do {
-                    tb_set_cell(xOffset++ + 1, h - 3 - yOffset, pw->pw_name[j], INPUT_FG - 32, TB_HI_BLACK);
-                } while (pw->pw_name[j++] != 0 && xOffset < w - 4);
+                    tb_set_cell(xOffset++ + 1, h - 3 - yOffset, username[j], INPUT_FG - 32, TB_HI_BLACK);
+                } while (username[j++] != 0 && xOffset < w - 4);
                 tb_set_cell(xOffset++, h - 3 - yOffset, ':', INPUT_FG - 32, TB_HI_BLACK);
                 j = 0;
                 do {
