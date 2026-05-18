@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
             buf[--c] = 0;
         }
         if (ev.type == TB_EVENT_KEY && ev.key == TB_KEY_ENTER && c > 0) {
-            if (historyBufCount >= HISTORY_BUFSIZ) {
+            if (historyBufCount >= HISTORY_BUFSIZ || historyBufCount >= h - 3) {
                 for (int i = 0; i < (HISTORY_BUFSIZ - 1) * TEXT_BUFSIZ; i++) {
                     historyBuf[i] = historyBuf[i + TEXT_BUFSIZ];
                 }
