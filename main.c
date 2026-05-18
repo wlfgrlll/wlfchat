@@ -30,8 +30,12 @@ int main(int argc, char **argv) {
     uint16_t historyBufCount = 0; //Chat history buffer message count
 
     //Initialize buffers
-    historyBuf = calloc(TEXT_BUFSIZ * HISTORY_BUFSIZ, sizeof(wchar_t));
     buf[0] = 0;
+    historyBuf = calloc(TEXT_BUFSIZ * HISTORY_BUFSIZ, sizeof(wchar_t));
+    if (historyBuf == NULL) {
+        tb_shutdown();
+        return 1;
+    }
 
     //Main event loop
     do {
