@@ -12,7 +12,7 @@
 int main(int argc, char **argv) {
     uid_t uid = geteuid(); // Get the effective user ID
     struct passwd *pw = getpwuid(uid);
-    const char *username = pw ? pw->pw_name : "unknown";
+    const char *username = pw ? pw->pw_name : "???";
     tb_init();
     tb_set_output_mode(TB_OUTPUT_256);
     tb_set_clear_attrs(TB_DEFAULT,  236);
