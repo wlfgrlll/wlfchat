@@ -1,0 +1,9 @@
+#ifndef WLFCHAT_CONSTANTS_H
+#define WLFCHAT_CONSTANTS_H
+
+#define TEXT_BUFSIZ 64
+#define HISTORY_BUFSIZ 256
+#define INPUT_BG 0xf1
+#define INPUT_FG 226
+
+#endif // WLFCHAT_CONSTANTS_H
