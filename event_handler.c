@@ -35,18 +35,6 @@ void handle_key_event(struct tb_event *ev, uint32_t *buf, int *c, int w, uint32_
         buf[--(*c)] = 0;
     }
     if (ev->key == TB_KEY_ENTER && *c > 0) {
-        // Send to stdout
-        for (int i = 0; i < *c; i++) {
-            char out[8];
-            int len = tb_utf8_unicode_to_char(out, buf[i]);
-            if (len > 0) {
-                out[len] = 0;
-                printf("%s", out);
-            }
-        }
-        printf("\n");
-        fflush(stdout);
-
         add_to_history(buf, historyBuf, historyBufCount, h);
         *c = 0;
         buf[0] = 0;

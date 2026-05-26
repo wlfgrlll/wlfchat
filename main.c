@@ -15,11 +15,12 @@ int main(int argc, char **argv) {
     const char *username = pw ? pw->pw_name : "???";
 
     //Initialize termbox2
-    if (tb_init() < 0) {
+    int res = tb_init();
+    if (res < 0) {
         fprintf(stderr, "Failed to initialize TUI with error code %d\n", res);
         return 1;
     }
-    tb_set_output_mode(TB_OUTPUT_256);
+    tb_set_output_mode(TB_OUTPUT_256); //TODO: Don't assume terminal supports 256 colors
     tb_set_clear_attrs(TB_DEFAULT,  236);
     int w = tb_width();
     int h = tb_height();
@@ -46,10 +47,6 @@ int main(int argc, char **argv) {
         int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
     }
-
-    char stdin_line[4096];
-    int stdin_line_len = 0;
-    bool stdin_discarding = false;
 
     while (1) {
         render_ui(w, h, c, buf, historyBuf, historyBufCount, username);
